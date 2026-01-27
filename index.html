@@ -16,12 +16,15 @@
         .status-icon { font-size: 24px; font-weight: bold; width: 35px; text-align: center; }
         .ok { color: var(--landal); }
         .fail { color: var(--warn); }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; padding: 12px; background: #fafafa; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; padding: 12px; background: #fafafa; }
         .item { display: flex; flex-direction: column; gap: 4px; font-size: 11px; font-weight: bold; }
-        select { padding: 6px; border-radius: 4px; border: 1px solid #ccc; font-size: 13px; background: white; }
+        select, input { padding: 6px; border-radius: 4px; border: 1px solid #ccc; font-size: 13px; background: white; height: 32px; }
         select.mangel-bg { background: #ffebee; color: var(--warn); border-color: var(--warn); }
         .footer { margin-top: 30px; padding: 20px; border-top: 2px solid #eee; }
         .btn-send { width: 100%; padding: 18px; background: var(--landal); color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
+        .btn-clear { background: #666; margin-top: 10px; padding: 10px; font-size: 12px; width: auto; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .date-row { display: flex; gap: 5px; }
+        .date-row select { flex: 1; }
     </style>
 </head>
 <body>
@@ -29,18 +32,22 @@
 <div class="box">
     <h1>Brandschutz-Rundgang Landal Hochwald</h1>
     
-    <form action="https://formspree.io/f/mzdrkord" method="POST">
+    <form action="https://formspree.io/f/mzdrkord" method="POST" id="mainForm">
         
         <div id="list-container"></div>
         
+        <textarea name="ÜBERSICHT_ERGEBNISSE" id="summary_field" style="display:none;"></textarea>
+
         <div class="footer">
-            <label><b>Deine E-Mail (für Bestätigung):</b></label>
-            <input type="email" name="email" placeholder="marc.morscheit@landal.com" style="width:100%; padding:15px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;" required>
+            <label><b>Deine E-Mail:</b></label>
+            <input type="email" name="email" id="save_email" placeholder="marc.morscheit@landal.com" style="width:100%; padding:15px; margin: 10px 0; box-sizing: border-box;" required>
             
             <label><b>Prüfer Name:</b></label>
-            <input type="text" name="Pruefer" placeholder="Vorname Nachname" style="width:100%; padding:15px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;" required>
+            <input type="text" name="Pruefer" id="save_Pruefer" placeholder="Vorname Nachname" style="width:100%; padding:15px; margin: 10px 0; box-sizing: border-box;" required>
 
             <button type="submit" class="btn-send">Protokoll senden</button>
+            <button type="button" class="btn-clear" onclick="clearStorage()">Speicher leeren (Reset)</button>
+            
             <p style="font-size: 10px; color: #999; text-align: center; margin-top: 15px;">Copyright Marc Morscheit ab 2026</p>
         </div>
     </form>
@@ -104,14 +111,20 @@
         { nr: "V4", nr_id: "V4", ort: "Fahrzeuge", beschr: "TR-LG-40", gew: "6 kg", typ: "Pulver", bj: "2023" }
     ];
 
-    const kriterien = ["Zustand", "Plombe", "Pruefsiegel", "Beschilderung"];
+    const monate = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
+    const currentYear = new Date().getFullYear();
 
     function render() {
         const cont = document.getElementById('list-container');
         loescher.forEach((l, idx) => {
             const idKey = l.nr_id || l.nr;
+            let yearOptions = `<option value="">Jahr</option>`;
+            for(let i=0; i<=4; i++) {
+                yearOptions += `<option value="${currentYear + i}">${currentYear + i}</option>`;
+            }
+
             let html = `
-            <div class="card">
+            <div class="card" data-nr="${l.nr}">
                 <div class="card-header">
                     <div>
                         <div class="l-title">Nr. ${l.nr} - ${l.ort}: ${l.beschr}</div>
@@ -119,34 +132,76 @@
                     </div>
                     <div class="status-icon" id="ic_${idx}">✔</div>
                 </div>
-                <div class="grid">`;
-            
-            kriterien.forEach(k => {
-                html += `
-                <div class="item">${k}
-                    <select name="L${idKey}_${k}" onchange="updateIcon(${idx})">
-                        <option value="Ok">Ok</option>
-                        <option value="Mangel">Mangel</option>
-                    </select>
-                </div>`;
-            });
-
-            html += `</div></div>`;
+                <div class="grid">
+                    <div class="item">Zustand
+                        <select id="L${idKey}_Zustand" onchange="saveAndRefresh(${idx})">
+                            <option value="Ok">Ok</option>
+                            <option value="Mangel">Mangel</option>
+                        </select>
+                    </div>
+                    <div class="item">Plombe
+                        <select id="L${idKey}_Plombe" onchange="saveAndRefresh(${idx})">
+                            <option value="Ok">Ok</option>
+                            <option value="Mangel">Mangel</option>
+                        </select>
+                    </div>
+                    <div class="item">Prüfsiegel
+                        <div class="date-row">
+                            <select id="L${idKey}_Monat" onchange="saveAndRefresh(${idx})">
+                                <option value="">Monat</option>
+                                ${monate.map(m => `<option value="${m}">${m}</option>`).join('')}
+                            </select>
+                            <select id="L${idKey}_Jahr" onchange="saveAndRefresh(${idx})">
+                                ${yearOptions}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="item">Beschilderung
+                        <select id="L${idKey}_Beschilderung" onchange="saveAndRefresh(${idx})">
+                            <option value="Ok">Ok</option>
+                            <option value="Mangel">Mangel</option>
+                        </select>
+                    </div>
+                </div>
+            </div>`;
             cont.insertAdjacentHTML('beforeend', html);
-            updateIcon(idx);
         });
+        loadSavedData();
+    }
+
+    function saveAndRefresh(idx) {
+        saveData();
+        updateIcon(idx);
+    }
+
+    function saveData() {
+        const inputs = document.querySelectorAll('select, input');
+        inputs.forEach(input => {
+            if (input.id) localStorage.setItem(input.id, input.value);
+        });
+    }
+
+    function loadSavedData() {
+        const inputs = document.querySelectorAll('select, input');
+        inputs.forEach(input => {
+            const savedValue = localStorage.getItem(input.id);
+            if (savedValue !== null) input.value = savedValue;
+        });
+        loescher.forEach((_, idx) => updateIcon(idx));
     }
 
     function updateIcon(idx) {
         const card = document.querySelectorAll('.card')[idx];
+        if(!card) return;
         const selects = card.querySelectorAll('select');
         const icon = document.getElementById(`ic_${idx}`);
         let allOk = true;
 
         selects.forEach(s => {
-            if (s.value === "Mangel") {
+            if (s.value === "Mangel" || s.value === "") {
                 allOk = false;
-                s.classList.add('mangel-bg');
+                if(s.value === "Mangel") s.classList.add('mangel-bg');
+                else s.classList.remove('mangel-bg');
             } else {
                 s.classList.remove('mangel-bg');
             }
@@ -154,6 +209,39 @@
 
         icon.innerText = allOk ? "✔" : "✘";
         icon.className = allOk ? "status-icon ok" : "status-icon fail";
+    }
+
+    // DIESE FUNKTION ERSTELLT DIE ÜBERSICHTLICHE LISTE FÜR DIE EMAIL
+    document.getElementById('mainForm').onsubmit = function() {
+        let summary = "PRÜFPROTOKOLL ÜBERSICHT:\n\n";
+        
+        loescher.forEach((l, idx) => {
+            const idKey = l.nr_id || l.nr;
+            const zustand = document.getElementById(`L${idKey}_Zustand`).value;
+            const plombe = document.getElementById(`L${idKey}_Plombe`).value;
+            const monat = document.getElementById(`L${idKey}_Monat`).value;
+            const jahr = document.getElementById(`L${idKey}_Jahr`).value;
+            const schild = document.getElementById(`L${idKey}_Beschilderung`).value;
+            
+            const isOk = (zustand === "Ok" && plombe === "Ok" && schild === "Ok" && monat !== "" && jahr !== "");
+            const statusSymbol = isOk ? "[✔] OK   " : "[✘] MANGEL";
+            
+            summary += `Löscher ${l.nr} (${l.ort}): ${statusSymbol} -> Siegel: ${monat} ${jahr}`;
+            if(!isOk) {
+                summary += ` | Details: Zst:${zustand}, Plb:${plombe}, Schld:${schild}`;
+            }
+            summary += "\n";
+        });
+        
+        document.getElementById('summary_field').value = summary;
+        return true; // Formular absenden
+    };
+
+    function clearStorage() {
+        if(confirm("Möchtest du wirklich alle gespeicherten Eingaben löschen?")) {
+            localStorage.clear();
+            location.reload();
+        }
     }
 
     render();
