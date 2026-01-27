@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brandschutz-Rundgang Landal Hochwald Feuerlöscher</title>
+    <style>
+        :root { --landal: #2e7d32; --warn: #c62828; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f7f6; margin: 0; padding: 10px; }
+        .box { max-width: 850px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        h1 { color: var(--landal); text-align: center; border-bottom: 3px solid var(--landal); padding-bottom: 10px; }
+        .card { border: 1px solid #ddd; margin-bottom: 15px; border-radius: 10px; background: #fff; }
+        .card-header { background: #f9f9f9; padding: 12px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .l-title { font-weight: bold; font-size: 14px; }
+        .l-specs { font-size: 12px; color: #666; margin-top: 4px; }
+        .status-icon { font-size: 24px; font-weight: bold; width: 35px; text-align: center; }
+        .ok { color: var(--landal); }
+        .fail { color: var(--warn); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; padding: 12px; background: #fafafa; }
+        .item { display: flex; flex-direction: column; gap: 4px; font-size: 11px; font-weight: bold; }
+        select { padding: 6px; border-radius: 4px; border: 1px solid #ccc; font-size: 13px; background: white; }
+        select.mangel-bg { background: #ffebee; color: var(--warn); border-color: var(--warn); }
+        .footer { margin-top: 30px; padding: 20px; border-top: 2px solid #eee; }
+        .btn-send { width: 100%; padding: 18px; background: var(--landal); color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h1>Brandschutz-Rundgang Landal Hochwald Feuerlöscher</h1>
+    
+    <form action="https://formspree.io/f/mzdrkord" method="POST" id="checkForm">
+        
+        <div id="list-container"></div>
+        
+        <div class="footer">
+            <label><b>Prüfer (Klarname):</b></label>
+            <input type="text" id="pName" name="Prüfer" placeholder="Vorname Nachname" style="width:100%; padding:15px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;" required>
+            
+            <button type="submit" class="btn-send">Protokoll senden</button>
+            <p style="font-size: 10px; color: #999; text-align: center; margin-top: 15px;">Copyright Marc Morscheit ab 2026</p>
+        </div>
+    </form>
+</div>
+
+<script>
+    const loescher = [
+        { nr: "01", ort: "Rezeption", beschr: "Theke Rezz/Shop", gew: "6 kg", typ: "Schaum", bj: "2001" },
+        { nr: "02", ort: "Rezeption", beschr: "Flur Büro Buchhaltung", gew: "6 kg", typ: "Schaum", bj: "2001" },
+        { nr: "03", ort: "Rezeption", beschr: "Flur Küche/Toiletten", gew: "6 kg", typ: "Schaum", bj: "2001" },
+        { nr: "04", ort: "Flur unten", beschr: "Flur Haupteingang", gew: "6 kg", typ: "Pulver", bj: "2009" },
+        { nr: "05", ort: "Flur unten", beschr: "Bowlingbahn", gew: "6 kg", typ: "Pulver", bj: "2017" },
+        { nr: "06", ort: "Hallenbad", beschr: "Flur Sauna", gew: "6 kg", typ: "Schaum", bj: "2021" },
+        { nr: "33", ort: "Hallenbad", beschr: "Elektroraum", gew: "-", typ: "Kohlendioxid", bj: "2025" },
+        { nr: "08", ort: "Hallenbad", beschr: "Flur Eingang Hallenbad", gew: "6 kg", typ: "Schaum", bj: "2001" },
+        { nr: "09", ort: "Hallenbad", beschr: "Hallenbad Notausgang", gew: "6 kg", typ: "Schaum", bj: "2001" },
+        { nr: "10", ort: "Hallenbad", beschr: "Hallenbad Technikraum", gew: "6 kg", typ: "Pulver", bj: "2017" },
+        { nr: "11", ort: "SB-Laden", beschr: "Vorbereitungsraum", gew: "6 kg", typ: "Pulver", bj: "2024" },
+        { nr: "12", ort: "SB-Laden", beschr: "Flur Lager", gew: "6 kg", typ: "Pulver", bj: "2006" },
+        { nr: "13", ort: "Lagerbereich unten", beschr: "Fahrradverleih", gew: "6 kg", typ: "Pulver", bj: "2011" },
+        { nr: "14", ort: "Lagerbereich unten", beschr: "Flur RWE", gew: "6 kg", typ: "Kohlendioxid", bj: "2009" },
+        { nr: "15", ort: "Lagerbereich unten", beschr: "Flur Heizungsraum", gew: "12 kg", typ: "Pulver", bj: "2001" },
+        { nr: "16", ort: "Lagerbereich unten", beschr: "Heizungsraum", gew: "12 kg", typ: "Pulver", bj: "2001" },
+        { nr: "17", ort: "TD", beschr: "Werkstatt", gew: "12 kg", typ: "Pulver", bj: "2001" },
+        { nr: "18", ort: "TD", beschr: "Rolltor", gew: "6 kg", typ: "Schaum", bj: "2021" },
+        { nr: "19", ort: "Spielhalle", beschr: "Anbauseite Pfeiler 2", gew: "6 kg", typ: "Pulver", bj: "2019" },
+        { nr: "20", ort: "Spielhalle", beschr: "Anbauseite Pfeiler 2", gew: "6 kg", typ: "Pulver", bj: "2001" },
+        { nr: "21", ort: "Spielhalle", beschr: "Anbauseite Pfeiler 6", gew: "6 kg", typ: "Schaum", bj: "2021" },
+        { nr: "22", ort: "Spielhalle", beschr: "Anbauseite Pfeiler 6", gew: "6 kg", typ: "Pulver", bj: "2011" },
+        { nr: "23", ort: "Spielhalle", beschr: "Vorderseite Pfeiler 1", gew: "6 kg", typ: "Pulver", bj: "2011" },
+        { nr: "24", ort: "Spielhalle", beschr: "Vorderseite Pfeiler 1", gew: "6 kg", typ: "Pulver", bj: "2011" },
+        { nr: "25", ort: "Spielhalle", beschr: "Vorderseite Pfeiler 5", gew: "6 kg", typ: "Pulver", bj: "2019" },
+        { nr: "26", ort: "Spielhalle", beschr: "Vorderseite Pfeiler 5", gew: "6 kg", typ: "Pulver", bj: "2019" },
+        { nr: "27", ort: "Spielhalle", beschr: "Flur Toiletten", gew: "6 kg", typ: "Schaum", bj: "2001" },
+        { nr: "28", ort: "Spielhalle", beschr: "Bastelraum", gew: "6 kg", typ: "Pulver", bj: "2017" },
+        { nr: "29", ort: "Spielhalle", beschr: "Reinigung Notausgang", gew: "6 kg", typ: "Pulver", bj: "2011" },
+        { nr: "30", ort: "Restaurant", beschr: "Theke", gew: "6 kg", typ: "Schaum", bj: "2008" },
+        { nr: "31", ort: "Restaurant", beschr: "Küche Raum Tiefkühlzellen", gew: "6 l", typ: "Fettbrand", bj: "2001" },
+        { nr: "32", ort: "Restaurant", beschr: "Küche Raum Tiefkühlzellen", gew: "6 kg", typ: "Schaum", bj: "2001" },
+        { nr: "32-Zusatz", ort: "Restaurant", beschr: "Zusatz Löschdecke", gew: "-", typ: "Decke", bj: "-" },
+        { nr: "34", ort: "Restaurant", beschr: "Lager Ausgang", gew: "6 kg", typ: "Pulver", bj: "2011" },
+        { nr: "35", ort: "Restaurant", beschr: "Gasraum", gew: "6 kg", typ: "Pulver", bj: "2009" },
+        { nr: "36", ort: "Wohnung HG", beschr: "Obergeschoss", gew: "6 kg", typ: "Pulver", bj: "2013" },
+        { nr: "37", ort: "Wohnung HG", beschr: "Obergeschoss", gew: "6 kg", typ: "Pulver", bj: "2009" },
+        { nr: "38", ort: "Wohnung HG", beschr: "Obergeschoss", gew: "6 kg", typ: "Pulver", bj: "2011" },
+        { nr: "39", ort: "Wohnung HG", beschr: "Dachgeschoss", gew: "6 kg", typ: "Pulver", bj: "2013" },
+	{ nr: "41", ort: "Gelände", beschr: "Schuppen", gew: "6 kg", typ: "Pulver", bj: "2025" },
+        { nr: "-", ort: "Gelände", beschr: "Rangerhaus", gew: "12 kg", typ: "Pulver", bj: "2001" },
+        { nr: "42", ort: "Gelände", beschr: "Mobilheime Reinigung", gew: "6 kg", typ: "Pulver", bj: "2006" },
+        { nr: "44", ort: "Gelände", beschr: "Bungalow 188", gew: "6 kg", typ: "Pulver", bj: "2025" },
+	{ nr: "45", ort: "Gelände", beschr: "", gew: "6 kg", typ: "Pulver", bj: "2001" },
+        { nr: "46", ort: "Gelände", beschr: "Bungalow 229", gew: "6 kg", typ: "Pulver", bj: "2001" },
+	{ nr: "47", ort: "Gelände", beschr: "", gew: "6 kg", typ: "Pulver", bj: "2022" },
+        { nr: "48", ort: "Gelände", beschr: "Bungalow 218", gew: "6 kg", typ: "Pulver", bj: "2017" },
+	{ nr: "49", ort: "Gelände", beschr: "", gew: "6 kg", typ: "Pulver", bj: "2023" },
+        { nr: "50", ort: "Gelände", beschr: "Bungalow 208", gew: "6 kg", typ: "Pulver", bj: "2022" },
+	{ nr: "51", ort: "Gelände", beschr: "", gew: "6 kg", typ: "Pulver", bj: "2023" },
+        { nr: "-", ort: "Fahrzeuge", beschr: "TR-HW-456", gew: "6 kg", typ: "Pulver", bj: "2021" },
+        { nr: "-", ort: "Fahrzeuge", beschr: "TR-HW-987", gew: "6 kg", typ: "Pulver", bj: "2023" },
+        { nr: "-", ort: "Fahrzeuge", beschr: "D-LG-230 E", gew: "6 kg", typ: "Pulver", bj: "2025" },
+        { nr: "-", ort: "Fahrzeuge", beschr: "TR-LG-40", gew: "6 kg", typ: "Pulver", bj: "2023" }
+    ];
+
+    const kriterien = [
+        { id: "Zustand", opt: ["Ok", "Nicht Ok"] },
+        { id: "Plombe", opt: ["Vorhanden", "Nicht vorhanden"] },
+        { id: "Pruefsiegel", opt: ["Vorhanden", "Nicht vorhanden"] },
+        { id: "Beschilderung", opt: ["Ok", "Nicht Ok"] }
+    ];
+
+    function render() {
+        const cont = document.getElementById('list-container');
+        loescher.forEach((l, idx) => {
+            let html = `<div class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="l-title">Nr. ${l.nr} - ${l.ort}: ${l.beschr}</div>
+                        <div class="l-specs">${l.gew} ${l.typ} | Baujahr: ${l.bj}</div>
+                    </div>
+                    <div class="status-icon" id="ic_${idx}">✔</div>
+                </div>
+                <div class="grid">`;
+            kriterien.forEach(k => {
+                // 'name' hinzugefügt, damit Formspree die Daten erkennt
+                html += `<div class="item">${k.id}
+                    <select name="Lösch_Nr_${l.nr}_${k.id}" onchange="update(${idx})">
+                        <option value="${k.opt[0]}">${k.opt[0]}</option>
+                        <option value="${k.opt[1]}">${k.opt[1]}</option>
+                    </select></div>`;
+            });
+            html += `</div></div>`;
+            cont.innerHTML += html;
+            update(idx);
+        });
+    }
+
+    function update(idx) {
+        const sels = document.querySelectorAll(`select[name^="Lösch_Nr_${loescher[idx].nr}_"]`);
+        const ic = document.getElementById(`ic_${idx}`);
+        let ok = true;
+        sels.forEach((s, i) => {
+            if(s.value === kriterien[i].opt[1]) { ok = false; s.classList.add('mangel-bg'); }
+            else { s.classList.remove('mangel-bg'); }
+        });
+        ic.innerText = ok ? "✔" : "✘";
+        ic.className = ok ? "status-icon ok" : "status-icon fail";
+    }
+
+    render();
+</script>
+</body>
+</html>
