@@ -84,21 +84,21 @@
         { nr: "37", ort: "Wohnung HG", beschr: "Obergeschoss", gew: "6 kg", typ: "Pulver", bj: "2009" },
         { nr: "38", ort: "Wohnung HG", beschr: "Obergeschoss", gew: "6 kg", typ: "Pulver", bj: "2011" },
         { nr: "39", ort: "Wohnung HG", beschr: "Dachgeschoss", gew: "6 kg", typ: "Pulver", bj: "2013" },
-	{ nr: "41", ort: "Gelände", beschr: "Schuppen", gew: "6 kg", typ: "Pulver", bj: "2025" },
-        { nr: "-", ort: "Gelände", beschr: "Rangerhaus", gew: "12 kg", typ: "Pulver", bj: "2001" },
+        { nr: "41", ort: "Gelände", beschr: "Schuppen", gew: "6 kg", typ: "Pulver", bj: "2025" },
+        { nr: "Rangerhaus", ort: "Gelände", beschr: "Rangerhaus", gew: "12 kg", typ: "Pulver", bj: "2001" },
         { nr: "42", ort: "Gelände", beschr: "Mobilheime Reinigung", gew: "6 kg", typ: "Pulver", bj: "2006" },
         { nr: "44", ort: "Gelände", beschr: "Bungalow 188", gew: "6 kg", typ: "Pulver", bj: "2025" },
-	{ nr: "45", ort: "Gelände", beschr: "", gew: "6 kg", typ: "Pulver", bj: "2001" },
+        { nr: "45", ort: "Gelände", beschr: "Löscher 45", gew: "6 kg", typ: "Pulver", bj: "2001" },
         { nr: "46", ort: "Gelände", beschr: "Bungalow 229", gew: "6 kg", typ: "Pulver", bj: "2001" },
-	{ nr: "47", ort: "Gelände", beschr: "", gew: "6 kg", typ: "Pulver", bj: "2022" },
+        { nr: "47", ort: "Gelände", beschr: "Löscher 47", gew: "6 kg", typ: "Pulver", bj: "2022" },
         { nr: "48", ort: "Gelände", beschr: "Bungalow 218", gew: "6 kg", typ: "Pulver", bj: "2017" },
-	{ nr: "49", ort: "Gelände", beschr: "", gew: "6 kg", typ: "Pulver", bj: "2023" },
+        { nr: "49", ort: "Gelände", beschr: "Löscher 49", gew: "6 kg", typ: "Pulver", bj: "2023" },
         { nr: "50", ort: "Gelände", beschr: "Bungalow 208", gew: "6 kg", typ: "Pulver", bj: "2022" },
-	{ nr: "51", ort: "Gelände", beschr: "", gew: "6 kg", typ: "Pulver", bj: "2023" },
-        { nr: "-", ort: "Fahrzeuge", beschr: "TR-HW-456", gew: "6 kg", typ: "Pulver", bj: "2021" },
-        { nr: "-", ort: "Fahrzeuge", beschr: "TR-HW-987", gew: "6 kg", typ: "Pulver", bj: "2023" },
-        { nr: "-", ort: "Fahrzeuge", beschr: "D-LG-230 E", gew: "6 kg", typ: "Pulver", bj: "2025" },
-        { nr: "-", ort: "Fahrzeuge", beschr: "TR-LG-40", gew: "6 kg", typ: "Pulver", bj: "2023" }
+        { nr: "51", ort: "Gelände", beschr: "Löscher 51", gew: "6 kg", typ: "Pulver", bj: "2023" },
+        { nr: "V-456", ort: "Fahrzeuge", beschr: "TR-HW-456", gew: "6 kg", typ: "Pulver", bj: "2021" },
+        { nr: "V-987", ort: "Fahrzeuge", beschr: "TR-HW-987", gew: "6 kg", typ: "Pulver", bj: "2023" },
+        { nr: "V-230", ort: "Fahrzeuge", beschr: "D-LG-230 E", gew: "6 kg", typ: "Pulver", bj: "2025" },
+        { nr: "V-40", ort: "Fahrzeuge", beschr: "TR-LG-40", gew: "6 kg", typ: "Pulver", bj: "2023" }
     ];
 
     const kriterien = [
@@ -121,9 +121,9 @@
                 </div>
                 <div class="grid">`;
             kriterien.forEach(k => {
-                // 'name' hinzugefügt, damit Formspree die Daten erkennt
+                // Name-Attribut korrigiert für eindeutige Identifizierung
                 html += `<div class="item">${k.id}
-                    <select name="Lösch_Nr_${l.nr}_${k.id}" onchange="update(${idx})">
+                    <select name="Lnr_${l.nr.replace(/[^a-zA-Z0-9]/g, '_')}_${k.id}" onchange="update(${idx})">
                         <option value="${k.opt[0]}">${k.opt[0]}</option>
                         <option value="${k.opt[1]}">${k.opt[1]}</option>
                     </select></div>`;
@@ -135,13 +135,21 @@
     }
 
     function update(idx) {
-        const sels = document.querySelectorAll(`select[name^="Lösch_Nr_${loescher[idx].nr}_"]`);
+        // Selektor angepasst, um die IDs sicher zu finden
+        const safeNr = loescher[idx].nr.replace(/[^a-zA-Z0-9]/g, '_');
+        const sels = document.querySelectorAll(`select[name^="Lnr_${safeNr}_"]`);
         const ic = document.getElementById(`ic_${idx}`);
         let ok = true;
+        
         sels.forEach((s, i) => {
-            if(s.value === kriterien[i].opt[1]) { ok = false; s.classList.add('mangel-bg'); }
-            else { s.classList.remove('mangel-bg'); }
+            if(s.value === kriterien[i].opt[1]) { 
+                ok = false; 
+                s.classList.add('mangel-bg'); 
+            } else { 
+                s.classList.remove('mangel-bg'); 
+            }
         });
+        
         ic.innerText = ok ? "✔" : "✘";
         ic.className = ok ? "status-icon ok" : "status-icon fail";
     }
