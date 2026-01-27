@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brandschutz-Rundgang Landal Hochwald Feuerlöscher</title>
+    <title>Brandschutz-Rundgang Landal Hochwald</title>
     <style>
         :root { --landal: #2e7d32; --warn: #c62828; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f7f6; margin: 0; padding: 10px; }
@@ -27,16 +27,19 @@
 <body>
 
 <div class="box">
-    <h1>Brandschutz-Rundgang Landal Hochwald Feuerlöscher</h1>
+    <h1>Brandschutz-Rundgang Landal Hochwald</h1>
     
-    <form action="https://formspree.io/f/mzdrkord" method="POST" id="checkForm">
+    <form action="https://formspree.io/f/mzdrkord" method="POST">
         
         <div id="list-container"></div>
         
         <div class="footer">
-            <label><b>Prüfer (Klarname):</b></label>
-            <input type="text" id="pName" name="Prüfer" placeholder="Vorname Nachname" style="width:100%; padding:15px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;" required>
+            <label><b>Deine E-Mail (für Bestätigung):</b></label>
+            <input type="email" name="email" placeholder="marc.morscheit@landal.com" style="width:100%; padding:15px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;" required>
             
+            <label><b>Prüfer Name:</b></label>
+            <input type="text" name="Pruefer" placeholder="Vorname Nachname" style="width:100%; padding:15px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;" required>
+
             <button type="submit" class="btn-send">Protokoll senden</button>
             <p style="font-size: 10px; color: #999; text-align: center; margin-top: 15px;">Copyright Marc Morscheit ab 2026</p>
         </div>
@@ -76,8 +79,8 @@
         { nr: "29", ort: "Spielhalle", beschr: "Reinigung Notausgang", gew: "6 kg", typ: "Pulver", bj: "2011" },
         { nr: "30", ort: "Restaurant", beschr: "Theke", gew: "6 kg", typ: "Schaum", bj: "2008" },
         { nr: "31", ort: "Restaurant", beschr: "Küche Raum Tiefkühlzellen", gew: "6 l", typ: "Fettbrand", bj: "2001" },
-        { nr: "32", ort: "Restaurant", beschr: "Küche Raum Tiefkühlzellen", gew: "6 kg", typ: "Schaum", bj: "2001" },
-        { nr: "32-Zusatz", ort: "Restaurant", beschr: "Zusatz Löschdecke", gew: "-", typ: "Decke", bj: "-" },
+        { nr: "32", nr_id: "32", ort: "Restaurant", beschr: "Küche Raum Tiefkühlzellen", gew: "6 kg", typ: "Schaum", bj: "2001" },
+        { nr: "32-Z", nr_id: "32Z", ort: "Restaurant", beschr: "Zusatz Löschdecke", gew: "-", typ: "Decke", bj: "-" },
         { nr: "34", ort: "Restaurant", beschr: "Lager Ausgang", gew: "6 kg", typ: "Pulver", bj: "2011" },
         { nr: "35", ort: "Restaurant", beschr: "Gasraum", gew: "6 kg", typ: "Pulver", bj: "2009" },
         { nr: "36", ort: "Wohnung HG", beschr: "Obergeschoss", gew: "6 kg", typ: "Pulver", bj: "2013" },
@@ -85,7 +88,7 @@
         { nr: "38", ort: "Wohnung HG", beschr: "Obergeschoss", gew: "6 kg", typ: "Pulver", bj: "2011" },
         { nr: "39", ort: "Wohnung HG", beschr: "Dachgeschoss", gew: "6 kg", typ: "Pulver", bj: "2013" },
         { nr: "41", ort: "Gelände", beschr: "Schuppen", gew: "6 kg", typ: "Pulver", bj: "2025" },
-        { nr: "Rangerhaus", ort: "Gelände", beschr: "Rangerhaus", gew: "12 kg", typ: "Pulver", bj: "2001" },
+        { nr: "Ranger", nr_id: "Ranger", ort: "Gelände", beschr: "Rangerhaus", gew: "12 kg", typ: "Pulver", bj: "2001" },
         { nr: "42", ort: "Gelände", beschr: "Mobilheime Reinigung", gew: "6 kg", typ: "Pulver", bj: "2006" },
         { nr: "44", ort: "Gelände", beschr: "Bungalow 188", gew: "6 kg", typ: "Pulver", bj: "2025" },
         { nr: "45", ort: "Gelände", beschr: "Löscher 45", gew: "6 kg", typ: "Pulver", bj: "2001" },
@@ -95,66 +98,66 @@
         { nr: "49", ort: "Gelände", beschr: "Löscher 49", gew: "6 kg", typ: "Pulver", bj: "2023" },
         { nr: "50", ort: "Gelände", beschr: "Bungalow 208", gew: "6 kg", typ: "Pulver", bj: "2022" },
         { nr: "51", ort: "Gelände", beschr: "Löscher 51", gew: "6 kg", typ: "Pulver", bj: "2023" },
-        { nr: "V-456", ort: "Fahrzeuge", beschr: "TR-HW-456", gew: "6 kg", typ: "Pulver", bj: "2021" },
-        { nr: "V-987", ort: "Fahrzeuge", beschr: "TR-HW-987", gew: "6 kg", typ: "Pulver", bj: "2023" },
-        { nr: "V-230", ort: "Fahrzeuge", beschr: "D-LG-230 E", gew: "6 kg", typ: "Pulver", bj: "2025" },
-        { nr: "V-40", ort: "Fahrzeuge", beschr: "TR-LG-40", gew: "6 kg", typ: "Pulver", bj: "2023" }
+        { nr: "V1", nr_id: "V1", ort: "Fahrzeuge", beschr: "TR-HW-456", gew: "6 kg", typ: "Pulver", bj: "2021" },
+        { nr: "V2", nr_id: "V2", ort: "Fahrzeuge", beschr: "TR-HW-987", gew: "6 kg", typ: "Pulver", bj: "2023" },
+        { nr: "V3", nr_id: "V3", ort: "Fahrzeuge", beschr: "D-LG-230 E", gew: "6 kg", typ: "Pulver", bj: "2025" },
+        { nr: "V4", nr_id: "V4", ort: "Fahrzeuge", beschr: "TR-LG-40", gew: "6 kg", typ: "Pulver", bj: "2023" }
     ];
 
-    const kriterien = [
-        { id: "Zustand", opt: ["Ok", "Nicht Ok"] },
-        { id: "Plombe", opt: ["Vorhanden", "Nicht vorhanden"] },
-        { id: "Pruefsiegel", opt: ["Vorhanden", "Nicht vorhanden"] },
-        { id: "Beschilderung", opt: ["Ok", "Nicht Ok"] }
-    ];
+    const kriterien = ["Zustand", "Plombe", "Pruefsiegel", "Beschilderung"];
 
     function render() {
         const cont = document.getElementById('list-container');
         loescher.forEach((l, idx) => {
-            let html = `<div class="card">
+            const idKey = l.nr_id || l.nr;
+            let html = `
+            <div class="card">
                 <div class="card-header">
                     <div>
                         <div class="l-title">Nr. ${l.nr} - ${l.ort}: ${l.beschr}</div>
-                        <div class="l-specs">${l.gew} ${l.typ} | Baujahr: ${l.bj}</div>
+                        <div class="l-specs">${l.gew} ${l.typ} | BJ: ${l.bj}</div>
                     </div>
                     <div class="status-icon" id="ic_${idx}">✔</div>
                 </div>
                 <div class="grid">`;
+            
             kriterien.forEach(k => {
-                // Name-Attribut korrigiert für eindeutige Identifizierung
-                html += `<div class="item">${k.id}
-                    <select name="Lnr_${l.nr.replace(/[^a-zA-Z0-9]/g, '_')}_${k.id}" onchange="update(${idx})">
-                        <option value="${k.opt[0]}">${k.opt[0]}</option>
-                        <option value="${k.opt[1]}">${k.opt[1]}</option>
-                    </select></div>`;
+                html += `
+                <div class="item">${k}
+                    <select name="L${idKey}_${k}" onchange="updateIcon(${idx})">
+                        <option value="Ok">Ok</option>
+                        <option value="Mangel">Mangel</option>
+                    </select>
+                </div>`;
             });
+
             html += `</div></div>`;
-            cont.innerHTML += html;
-            update(idx);
+            cont.insertAdjacentHTML('beforeend', html);
+            updateIcon(idx);
         });
     }
 
-    function update(idx) {
-        // Selektor angepasst, um die IDs sicher zu finden
-        const safeNr = loescher[idx].nr.replace(/[^a-zA-Z0-9]/g, '_');
-        const sels = document.querySelectorAll(`select[name^="Lnr_${safeNr}_"]`);
-        const ic = document.getElementById(`ic_${idx}`);
-        let ok = true;
-        
-        sels.forEach((s, i) => {
-            if(s.value === kriterien[i].opt[1]) { 
-                ok = false; 
-                s.classList.add('mangel-bg'); 
-            } else { 
-                s.classList.remove('mangel-bg'); 
+    function updateIcon(idx) {
+        const card = document.querySelectorAll('.card')[idx];
+        const selects = card.querySelectorAll('select');
+        const icon = document.getElementById(`ic_${idx}`);
+        let allOk = true;
+
+        selects.forEach(s => {
+            if (s.value === "Mangel") {
+                allOk = false;
+                s.classList.add('mangel-bg');
+            } else {
+                s.classList.remove('mangel-bg');
             }
         });
-        
-        ic.innerText = ok ? "✔" : "✘";
-        ic.className = ok ? "status-icon ok" : "status-icon fail";
+
+        icon.innerText = allOk ? "✔" : "✘";
+        icon.className = allOk ? "status-icon ok" : "status-icon fail";
     }
 
     render();
 </script>
+
 </body>
 </html>
