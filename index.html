@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Brandschutz-Rundgang Landal Hochwald</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         :root { --landal: #2e7d32; --warn: #c62828; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f7f6; margin: 0; padding: 10px; }
@@ -32,29 +33,32 @@
 <div class="box">
     <h1>Brandschutz-Rundgang Landal Hochwald</h1>
     
-    <form action="https://formspree.io/f/mzdrkord" method="POST" id="mainForm">
+    <div id="list-container"></div>
+    
+    <div class="footer">
+        <label><b>Deine E-Mail:</b></label>
+        <input type="email" id="save_email" placeholder="marc.morscheit@landal.com" style="width:100%; padding:15px; margin: 10px 0; box-sizing: border-box;" required>
         
-        <input type="hidden" name="_subject" value="Brandschutz-Protokoll Landal Hochwald">
-        <textarea name="ZUSAMMENFASSUNG_LISTE" id="summary_field" style="width: 100%; height: 100px; display:none;"></textarea>
+        <label><b>Prüfer Name:</b></label>
+        <input type="text" id="save_Pruefer" placeholder="Vorname Nachname" style="width:100%; padding:15px; margin: 10px 0; box-sizing: border-box;" required>
 
-        <div id="list-container"></div>
+        <button type="button" class="btn-send" onclick="sendMail()">Protokoll jetzt senden</button>
+        <button type="button" class="btn-clear" onclick="clearStorage()">Speicher leeren (Reset)</button>
         
-        <div class="footer">
-            <label><b>Deine E-Mail:</b></label>
-            <input type="email" name="email" id="save_email" placeholder="marc.morscheit@landal.com" style="width:100%; padding:15px; margin: 10px 0; box-sizing: border-box;" required>
-            
-            <label><b>Prüfer Name:</b></label>
-            <input type="text" name="Pruefer" id="save_Pruefer" placeholder="Vorname Nachname" style="width:100%; padding:15px; margin: 10px 0; box-sizing: border-box;" required>
-
-            <button type="submit" class="btn-send">Protokoll jetzt senden</button>
-            <button type="button" class="btn-clear" onclick="clearStorage()">Speicher leeren (Reset)</button>
-            
-            <p style="font-size: 10px; color: #999; text-align: center; margin-top: 15px;">Copyright Marc Morscheit ab 2026</p>
-        </div>
-    </form>
+        <p style="font-size: 10px; color: #999; text-align: center; margin-top: 15px;">Copyright Marc Morscheit ab 2026</p>
+    </div>
 </div>
 
 <script>
+    // --- EMAILJS KONFIGURATION ---
+    const SERVICE_ID = "service_gi4li9h"; 
+    const TEMPLATE_ID = "HIER_DEINE_TEMPLATE_ID_EINTRAGEN"; 
+    const PUBLIC_KEY = "HIER_DEINEN_PUBLIC_KEY_EINTRAGEN"; 
+
+    (function(){
+        emailjs.init(PUBLIC_KEY);
+    })();
+
     const loescher = [
         { nr: "01", ort: "Rezeption", beschr: "Theke Rezz/Shop", gew: "6 kg", typ: "Schaum", bj: "2001" },
         { nr: "02", ort: "Rezeption", beschr: "Flur Büro Buchhaltung", gew: "6 kg", typ: "Schaum", bj: "2001" },
@@ -67,7 +71,7 @@
         { nr: "09", ort: "Hallenbad", beschr: "Hallenbad Notausgang", gew: "6 kg", typ: "Schaum", bj: "2001" },
         { nr: "10", ort: "Hallenbad", beschr: "Hallenbad Technikraum", gew: "6 kg", typ: "Pulver", bj: "2017" },
         { nr: "11", ort: "SB-Laden", beschr: "Vorbereitungsraum", gew: "6 kg", typ: "Pulver", bj: "2024" },
-        { nr: "12", ort: "SB-Laden", beschr: "Flur Lager", gew: "6 kg", typ: "Pulver", bj: "2006" },
+        { nr: "12", ort: "SB-Laden", icon_id: "12", ort: "SB-Laden", beschr: "Flur Lager", gew: "6 kg", typ: "Pulver", bj: "2006" },
         { nr: "13", ort: "Lagerbereich unten", beschr: "Fahrradverleih", gew: "6 kg", typ: "Pulver", bj: "2011" },
         { nr: "14", ort: "Lagerbereich unten", beschr: "Flur RWE", gew: "6 kg", typ: "Kohlendioxid", bj: "2009" },
         { nr: "15", ort: "Lagerbereich unten", beschr: "Flur Heizungsraum", gew: "12 kg", typ: "Pulver", bj: "2001" },
@@ -109,7 +113,7 @@
         { nr: "V1", nr_id: "V1", ort: "Fahrzeuge", beschr: "TR-HW-456", gew: "6 kg", typ: "Pulver", bj: "2021" },
         { nr: "V2", nr_id: "V2", ort: "Fahrzeuge", beschr: "TR-HW-987", gew: "6 kg", typ: "Pulver", bj: "2023" },
         { nr: "V3", nr_id: "V3", ort: "Fahrzeuge", beschr: "D-LG-230 E", gew: "6 kg", typ: "Pulver", bj: "2025" },
-        { nr: "V4", nr_id: "V4", ort: "Fahrzeuge", beschr: "TR-LG-40", gew: "6 kg", typ: "Pulver", bj: "2023" }
+        { nr: "V4", nr_id: "V4", ort: "Fahrzeuge", hex_id: "V4", ort: "Fahrzeuge", beschr: "TR-LG-40", gew: "6 kg", typ: "Pulver", bj: "2023" }
     ];
 
     const monate = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
@@ -125,7 +129,7 @@
             }
 
             let html = `
-            <div class="card" data-nr="${l.nr}">
+            <div class="card">
                 <div class="card-header">
                     <div>
                         <div class="l-title">Nr. ${l.nr} - ${l.ort}: ${l.beschr}</div>
@@ -135,30 +139,30 @@
                 </div>
                 <div class="grid">
                     <div class="item">Zustand
-                        <select name="L${idKey}_Z" id="L${idKey}_Zustand" onchange="saveAndRefresh(${idx})">
+                        <select id="L${idKey}_Zustand" onchange="saveAndRefresh(${idx})">
                             <option value="Ok">Ok</option>
                             <option value="Mangel">Mangel</option>
                         </select>
                     </div>
                     <div class="item">Plombe
-                        <select name="L${idKey}_P" id="L${idKey}_Plombe" onchange="saveAndRefresh(${idx})">
+                        <select id="L${idKey}_Plombe" onchange="saveAndRefresh(${idx})">
                             <option value="Ok">Ok</option>
                             <option value="Mangel">Mangel</option>
                         </select>
                     </div>
                     <div class="item">Prüfsiegel
                         <div class="date-row">
-                            <select name="L${idKey}_M" id="L${idKey}_Monat" onchange="saveAndRefresh(${idx})">
+                            <select id="L${idKey}_Monat" onchange="saveAndRefresh(${idx})">
                                 <option value="">Monat</option>
                                 ${monate.map(m => `<option value="${m}">${m}</option>`).join('')}
                             </select>
-                            <select name="L${idKey}_J" id="L${idKey}_Jahr" onchange="saveAndRefresh(${idx})">
+                            <select id="L${idKey}_Jahr" onchange="saveAndRefresh(${idx})">
                                 ${yearOptions}
                             </select>
                         </div>
                     </div>
                     <div class="item">Beschilderung
-                        <select name="L${idKey}_B" id="L${idKey}_Beschilderung" onchange="saveAndRefresh(${idx})">
+                        <select id="L${idKey}_Beschilderung" onchange="saveAndRefresh(${idx})">
                             <option value="Ok">Ok</option>
                             <option value="Mangel">Mangel</option>
                         </select>
@@ -176,24 +180,21 @@
     }
 
     function saveData() {
-        const inputs = document.querySelectorAll('select, input');
-        inputs.forEach(input => {
-            if (input.id) localStorage.setItem(input.id, input.value);
+        document.querySelectorAll('select, input').forEach(el => {
+            if (el.id) localStorage.setItem(el.id, el.value);
         });
     }
 
     function loadSavedData() {
-        const inputs = document.querySelectorAll('select, input');
-        inputs.forEach(input => {
-            const savedValue = localStorage.getItem(input.id);
-            if (savedValue !== null) input.value = savedValue;
+        document.querySelectorAll('select, input').forEach(el => {
+            const val = localStorage.getItem(el.id);
+            if (val !== null) el.value = val;
         });
         loescher.forEach((_, idx) => updateIcon(idx));
     }
 
     function updateIcon(idx) {
         const card = document.querySelectorAll('.card')[idx];
-        if(!card) return;
         const selects = card.querySelectorAll('select');
         const icon = document.getElementById(`ic_${idx}`);
         let allOk = true;
@@ -201,8 +202,7 @@
         selects.forEach(s => {
             if (s.value === "Mangel" || s.value === "") {
                 allOk = false;
-                if(s.value === "Mangel") s.classList.add('mangel-bg');
-                else s.classList.remove('mangel-bg');
+                s.classList.toggle('mangel-bg', s.value === "Mangel");
             } else {
                 s.classList.remove('mangel-bg');
             }
@@ -212,9 +212,18 @@
         icon.className = allOk ? "status-icon ok" : "status-icon fail";
     }
 
-    // LISTE ERSTELLEN BEVOR DAS FORMULAR RAUSGEHT
-    document.getElementById('mainForm').onsubmit = function() {
-        let summary = "ÜBERSICHT PRÜFUNG:\n";
+    function sendMail() {
+        const pName = document.getElementById('save_Pruefer').value;
+        const pEmail = document.getElementById('save_email').value;
+
+        if(!pName || !pEmail) {
+            alert("Bitte Name und E-Mail ausfüllen!");
+            return;
+        }
+
+        let summary = "PRÜFPROTOKOLL LANDAL HOCHWALD\n";
+        summary += "==================================\n\n";
+        
         loescher.forEach((l) => {
             const idKey = l.nr_id || l.nr;
             const z = document.getElementById(`L${idKey}_Zustand`).value;
@@ -223,15 +232,32 @@
             const j = document.getElementById(`L${idKey}_Jahr`).value;
             const b = document.getElementById(`L${idKey}_Beschilderung`).value;
             
-            const status = (z==="Ok" && p==="Ok" && b==="Ok" && m!=="" && j!=="") ? "[OK]    " : "[MANGEL]";
-            summary += `${status} Nr. ${l.nr} (${l.ort}): Siegel ${m}/${j}\n`;
+            const isOk = (z==="Ok" && p==="Ok" && b==="Ok" && m!=="" && j!=="");
+            const statusSymbol = isOk ? "[✔] OK   " : "[✘] MANGEL";
+            
+            summary += `${statusSymbol} Löscher ${l.nr} (${l.ort}): Siegel ${m || '--'}/${j || '--'}`;
+            if(!isOk) {
+                summary += ` -> DETAILS: Zst:${z}, Plb:${p}, Schld:${b}`;
+            }
+            summary += "\n";
         });
-        document.getElementById('summary_field').value = summary;
-        return true; 
-    };
+
+        const templateParams = {
+            pruefer_name: pName,
+            pruefer_email: pEmail,
+            zusammenfassung: summary
+        };
+
+        emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams)
+            .then(() => {
+                alert("Protokoll wurde erfolgreich an " + pEmail + " gesendet!");
+            }, (error) => {
+                alert("Fehler beim Senden: " + JSON.stringify(error));
+            });
+    }
 
     function clearStorage() {
-        if(confirm("Möchtest du wirklich alle gespeicherten Eingaben löschen?")) {
+        if(confirm("Möchtest du alle gespeicherten Daten löschen?")) {
             localStorage.clear();
             location.reload();
         }
