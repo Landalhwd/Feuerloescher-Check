@@ -34,16 +34,19 @@
     
     <form action="https://formspree.io/f/mzdrkord" method="POST" id="mainForm">
         
+        <input type="hidden" name="_subject" value="Brandschutz-Protokoll Landal Hochwald">
+        <textarea name="ZUSAMMENFASSUNG_LISTE" id="summary_field" style="width: 100%; height: 100px; display:none;"></textarea>
+
         <div id="list-container"></div>
         
-        <input type="hidden" name="PRÜFPROTOKOLL_GESAMT" id="summary_field">
-
         <div class="footer">
+            <label><b>Deine E-Mail:</b></label>
+            <input type="email" name="email" id="save_email" placeholder="marc.morscheit@landal.com" style="width:100%; padding:15px; margin: 10px 0; box-sizing: border-box;" required>
             
             <label><b>Prüfer Name:</b></label>
-            <input type="text" name="Pruefer_Name" id="save_Pruefer" placeholder="Vorname Nachname" style="width:100%; padding:15px; margin: 10px 0; box-sizing: border-box;" required>
+            <input type="text" name="Pruefer" id="save_Pruefer" placeholder="Vorname Nachname" style="width:100%; padding:15px; margin: 10px 0; box-sizing: border-box;" required>
 
-            <button type="submit" class="btn-send">Protokoll senden</button>
+            <button type="submit" class="btn-send">Protokoll jetzt senden</button>
             <button type="button" class="btn-clear" onclick="clearStorage()">Speicher leeren (Reset)</button>
             
             <p style="font-size: 10px; color: #999; text-align: center; margin-top: 15px;">Copyright Marc Morscheit ab 2026</p>
@@ -132,30 +135,30 @@
                 </div>
                 <div class="grid">
                     <div class="item">Zustand
-                        <select id="L${idKey}_Zustand" onchange="saveAndRefresh(${idx})">
+                        <select name="L${idKey}_Z" id="L${idKey}_Zustand" onchange="saveAndRefresh(${idx})">
                             <option value="Ok">Ok</option>
                             <option value="Mangel">Mangel</option>
                         </select>
                     </div>
                     <div class="item">Plombe
-                        <select id="L${idKey}_Plombe" onchange="saveAndRefresh(${idx})">
+                        <select name="L${idKey}_P" id="L${idKey}_Plombe" onchange="saveAndRefresh(${idx})">
                             <option value="Ok">Ok</option>
                             <option value="Mangel">Mangel</option>
                         </select>
                     </div>
                     <div class="item">Prüfsiegel
                         <div class="date-row">
-                            <select id="L${idKey}_Monat" onchange="saveAndRefresh(${idx})">
+                            <select name="L${idKey}_M" id="L${idKey}_Monat" onchange="saveAndRefresh(${idx})">
                                 <option value="">Monat</option>
                                 ${monate.map(m => `<option value="${m}">${m}</option>`).join('')}
                             </select>
-                            <select id="L${idKey}_Jahr" onchange="saveAndRefresh(${idx})">
+                            <select name="L${idKey}_J" id="L${idKey}_Jahr" onchange="saveAndRefresh(${idx})">
                                 ${yearOptions}
                             </select>
                         </div>
                     </div>
                     <div class="item">Beschilderung
-                        <select id="L${idKey}_Beschilderung" onchange="saveAndRefresh(${idx})">
+                        <select name="L${idKey}_B" id="L${idKey}_Beschilderung" onchange="saveAndRefresh(${idx})">
                             <option value="Ok">Ok</option>
                             <option value="Mangel">Mangel</option>
                         </select>
@@ -173,14 +176,14 @@
     }
 
     function saveData() {
-        const inputs = document.querySelectorAll('select, input:not([type="hidden"])');
+        const inputs = document.querySelectorAll('select, input');
         inputs.forEach(input => {
             if (input.id) localStorage.setItem(input.id, input.value);
         });
     }
 
     function loadSavedData() {
-        const inputs = document.querySelectorAll('select, input:not([type="hidden"])');
+        const inputs = document.querySelectorAll('select, input');
         inputs.forEach(input => {
             const savedValue = localStorage.getItem(input.id);
             if (savedValue !== null) input.value = savedValue;
@@ -209,31 +212,23 @@
         icon.className = allOk ? "status-icon ok" : "status-icon fail";
     }
 
-    // LISTE VOR DEM ABSENDEN ERSTELLEN
-    document.getElementById('mainForm').addEventListener('submit', function(e) {
-        let summary = "PRÜFPROTOKOLL FEUERLÖSCHER - LANDAL HOCHWALD\n";
-        summary += "==================================\n\n";
-        
+    // LISTE ERSTELLEN BEVOR DAS FORMULAR RAUSGEHT
+    document.getElementById('mainForm').onsubmit = function() {
+        let summary = "ÜBERSICHT PRÜFUNG:\n";
         loescher.forEach((l) => {
             const idKey = l.nr_id || l.nr;
-            const zustand = document.getElementById(`L${idKey}_Zustand`).value;
-            const plombe = document.getElementById(`L${idKey}_Plombe`).value;
-            const monat = document.getElementById(`L${idKey}_Monat`).value;
-            const jahr = document.getElementById(`L${idKey}_Jahr`).value;
-            const schild = document.getElementById(`L${idKey}_Beschilderung`).value;
+            const z = document.getElementById(`L${idKey}_Zustand`).value;
+            const p = document.getElementById(`L${idKey}_Plombe`).value;
+            const m = document.getElementById(`L${idKey}_Monat`).value;
+            const j = document.getElementById(`L${idKey}_Jahr`).value;
+            const b = document.getElementById(`L${idKey}_Beschilderung`).value;
             
-            const isOk = (zustand === "Ok" && plombe === "Ok" && schild === "Ok" && monat !== "" && jahr !== "");
-            const statusSymbol = isOk ? "[OK]    " : "[MANGEL]";
-            
-            summary += `${statusSymbol} Löscher ${l.nr} (${l.ort}): Siegel ${monat || '--'} ${jahr || '--'}`;
-            if(!isOk) {
-                summary += ` -> DETAILS: Zst:${zustand}, Plb:${plombe}, Schld:${schild}`;
-            }
-            summary += "\n";
+            const status = (z==="Ok" && p==="Ok" && b==="Ok" && m!=="" && j!=="") ? "[OK]    " : "[MANGEL]";
+            summary += `${status} Nr. ${l.nr} (${l.ort}): Siegel ${m}/${j}\n`;
         });
-        
         document.getElementById('summary_field').value = summary;
-    });
+        return true; 
+    };
 
     function clearStorage() {
         if(confirm("Möchtest du wirklich alle gespeicherten Eingaben löschen?")) {
