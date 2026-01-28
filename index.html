@@ -53,7 +53,7 @@
     // --- EMAILJS KONFIGURATION ---
     const SERVICE_ID = "service_gi4li9h"; 
     const PUBLIC_KEY = "sYmMjD8KlOBNlsvZU";
-    const TEMPLATE_ID = "template_XXXXXXX"; // <--- BITTE HIER DEINE TEMPLATE-ID EINTRAGEN
+    const TEMPLATE_ID = "template_r4trufh"; 
 
     (function(){
         emailjs.init(PUBLIC_KEY);
@@ -185,7 +185,11 @@
         btn.disabled = true;
         btn.innerText = "Wird gesendet...";
 
-        let summary = "PRÜFPROTOKOLL LANDAL HOCHWALD\n\n";
+        let summary = "PRÜFPROTOKOLL LANDAL HOCHWALD\n";
+        summary += "Datum: " + new Date().toLocaleDateString('de-DE') + "\n";
+        summary += "Prüfer: " + pName + "\n";
+        summary += "----------------------------------\n\n";
+
         loescher.forEach((l) => {
             const idKey = l.nr.replace('-', '');
             const z = document.getElementById(`L${idKey}_Z`).value;
@@ -194,8 +198,11 @@
             const j = document.getElementById(`L${idKey}_J`).value;
             const b = document.getElementById(`L${idKey}_B`).value;
             const ok = (z==="Ok" && p==="Ok" && b==="Ok" && m!=="" && j!=="");
-            summary += `${ok ? "[✔] OK   " : "[✘] FEHLER"} Löscher ${l.nr} (${l.ort}): ${m}/${j}\n`;
-            if(!ok) summary += `    -> Mangel bei: ${z!=="Ok"?'Zustand ':''}${p!=="Ok"?'Plombe ':''}${b!=="Ok"?'Schild':''}\n`;
+            
+            summary += `${ok ? "[✔] OK   " : "[✘] MANGEL"} Nr. ${l.nr} (${l.ort}): ${m || '--'}/${j || '--'}\n`;
+            if(!ok) {
+                summary += `    -> Details: Zustand: ${z}, Plombe: ${p}, Schild: ${b}\n`;
+            }
         });
 
         emailjs.send(SERVICE_ID, TEMPLATE_ID, {
